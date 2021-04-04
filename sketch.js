@@ -1,6 +1,5 @@
-let x = 800;
-let y = 600;
-let rectSize = 5;
+let x, y;
+let rectSize = 10;
 let timeDelay = 1;
 let buttonNewArray, buttonShuffleArray, buttonBubbleSort;
 var array, arrayBackup;
@@ -9,6 +8,8 @@ let delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 let pivots = [];
 
 function setup() {
+  x = windowWidth;
+  y = parseInt(windowHeight * 0.95);
   createCanvas(x, y);
   fill('green');
   stroke(1);
@@ -26,13 +27,13 @@ function setup() {
   buttonBubbleSort.mousePressed(insertionSort);
 }
 
-function draw() {  
+function draw() {
   background(0, 0, 0);
-  for(let i = 0; i < this.array.length; i++) {    
+  for(let i = 0; i < this.array.length; i++) {
     if(pivots.includes(i))
       fill('red');
     else
-      fill('green');    
+      fill('green');
     rect(i*rectSize, y, rectSize, -this.array[i]);
   }
 }
@@ -92,7 +93,7 @@ async function selectionSort() {
       pivots[1] = i+j; //Visualize pivots
       if(array[i+j] < array[min]) {
         min = i+j;
-        pivots[0] = min; //Visualize pivots        
+        pivots[0] = min; //Visualize pivots
       }
       redraw();
       await sleep(timeDelay);
@@ -114,7 +115,7 @@ async function insertionSort() {
   redraw();
   await sleep(timeDelay);
   
-  let key, j;  
+  let key, j;
   for(let i = 1; i<array.length; i++) {
     key = array[i];
     j = i - 1;
@@ -124,10 +125,10 @@ async function insertionSort() {
       pivots[0] = j; //Visualize pivots
       pivots[1] = j+1; //Visualize pivots
       redraw();
-      await sleep(timeDelay);      
+      await sleep(timeDelay);
     }
     array[j+1] = key;
-  }  
+  }
   pivots = []; //Reset pivots
   redraw();
   console.log("Done!");
