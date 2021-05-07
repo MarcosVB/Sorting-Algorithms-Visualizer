@@ -1,139 +1,169 @@
 let x, y;
-let rectSize = 10;
+let rectSize = 2;
 let timeDelay = 1;
-let buttonNewArray, buttonShuffleArray, buttonBubbleSort;
-var array, arrayBackup;
-var pos;
-let delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-let pivots = [];
+let button;
+let array, arrayBackup;
 
 function setup() {
-  x = windowWidth;
-  y = parseInt(windowHeight * 0.95);
-  createCanvas(x, y);
-  fill('green');
-  stroke(1);
-  noLoop();
-  createArray();
-  buttonNewArray = createButton('New Array');
-  buttonNewArray.mousePressed(createArray);
-  buttonShuffleArray = createButton('Reset Array');
-  buttonShuffleArray.mousePressed(resetArray);
-  buttonBubbleSort = createButton('Bubble Sort');
-  buttonBubbleSort.mousePressed(bubbleSort);
-  buttonBubbleSort = createButton('Selection Sort');
-  buttonBubbleSort.mousePressed(selectionSort);
-  buttonBubbleSort = createButton('Insertion Sort');
-  buttonBubbleSort.mousePressed(insertionSort);
+    x = windowWidth;
+    y = parseInt(windowHeight * 0.95);
+    createCanvas(x, y);
+    stroke(1);
+    fill('green');
+    noLoop();
+    createArray();
+    button = createButton('New Array');
+    button.mousePressed(createArray);
+    button = createButton('Reset Array');
+    button.mousePressed(resetArray);
+    button = createButton('Bubble Sort');
+    button.mousePressed(bubbleSort);
+    button = createButton('Selection Sort');
+    button.mousePressed(selectionSort);
+    button = createButton('Insertion Sort');
+    button.mousePressed(insertionSort);
+    button = createButton('Merge Sort');
+    button.mousePressed(mergeSortCall);
 }
 
 function draw() {
-  background(0, 0, 0);
-  for(let i = 0; i < this.array.length; i++) {
-    if(pivots.includes(i))
-      fill('red');
-    else
-      fill('green');
-    rect(i*rectSize, y, rectSize, -this.array[i]);
-  }
+    background(0, 0, 0);
+    for (let i = 0; i < array.length; i++)
+        rect(i * rectSize, y, rectSize, -array[i]);
 }
 
 function createArray() {
-  array = [];
-  arrayBackup = [];
-  for(let i = 0; i < x/rectSize; i++) {
-    array.push(Math.floor(Math.random()*y));
-    arrayBackup.push(array[i]);
-  }
-  redraw();
+    array = [];
+    arrayBackup = [];
+
+    for (let i = 0; i < x / rectSize; i++) {
+        array.push(Math.floor(Math.random() * y));
+        arrayBackup.push(array[i]);
+    }
+    redraw();
 }
 
 function resetArray() {
-  array = [];
-  for(let i = 0; i < arrayBackup.length; i++) {
-    array.push(arrayBackup[i]);
-  }
-  redraw();
+    array = [];
+
+    for (let i = 0; i < arrayBackup.length; i++)
+        array.push(arrayBackup[i]);
+
+    redraw();
 }
 
 async function bubbleSort() {
-  redraw();
-  await sleep(timeDelay);
-  let change;
-  let cont = 0;
-  do {
-    change = false;
-    for(let i = 0; i < array.length-1-cont; i++) {
-        pivots[0] = i; //Visualize pivots
-        pivots[1] = i+1; //Visualize pivots
-        if(array[i] > array[i+1]) {
-          let aux = array[i];
-          array[i] = array[i+1];
-          array[i+1] = aux;
-          change = true;
-        }
-        redraw();
-        await sleep(timeDelay);
-    }
-    cont++;
-  }while(change)
-  pivots = []; //Reset pivots
-  redraw();
-  console.log("Done!");
+    let change;
+    let cont = 0;
+
+    do {
+        change = false;
+        for (let i = 0; i < array.length - 1 - cont; i++)
+            if (array[i] > array[i + 1]) {
+                swap(i, i + 1);
+                change = true;
+            }
+        cont++;
+        await drawWithDelay();
+    } while (change)
+
+    redraw();
+    console.log("Done!");
 }
 
 async function selectionSort() {
-  redraw();
-  await sleep(timeDelay);
-  let min;
-  for(let i = 0; i < array.length; i++) {
-    min = i;
-    pivots[0] = min; //Visualize pivots
-    for(let j = 0; j < array.length; j++) {
-      pivots[1] = i+j; //Visualize pivots
-      if(array[i+j] < array[min]) {
-        min = i+j;
-        pivots[0] = min; //Visualize pivots
-      }
-      redraw();
-      await sleep(timeDelay);
+    let min;
+
+    for (let i = 0; i < array.length; i++) {
+        min = i;
+        for (let j = 0; j < array.length; j++)
+            if (array[i + j] < array[min])
+                min = i + j;
+        if (min > i)
+            swap(i, min);
+        await drawWithDelay();
     }
-    if(min > i) {
-      let aux = array[i];
-      array[i] = array[min];
-      array[min] = aux;
-      redraw();
-      await sleep(timeDelay);
-    }
-  }
-  pivots = []; //Reset pivots
-  redraw();
-  console.log("Done!");
+    redraw();
+    console.log("Done!");
 }
 
 async function insertionSort() {
-  redraw();
-  await sleep(timeDelay);
-  
-  let key, j;
-  for(let i = 1; i<array.length; i++) {
-    key = array[i];
-    j = i - 1;
-    while(j >= 0 && key < array[j]) {
-      array[j+1] = array[j];
-      j--;
-      pivots[0] = j; //Visualize pivots
-      pivots[1] = j+1; //Visualize pivots
-      redraw();
-      await sleep(timeDelay);
+    let key, j;
+
+    for (let i = 1; i < array.length; i++) {
+        key = array[i];
+        j = i - 1;
+        while (j >= 0 && key < array[j]) {
+            array[j + 1] = array[j];
+            j--;
+        }
+        array[j + 1] = key;
+        await drawWithDelay();
     }
-    array[j+1] = key;
-  }
-  pivots = []; //Reset pivots
-  redraw();
-  console.log("Done!");
+    redraw();
+    console.log("Done!");
+}
+
+function mergeSortCall() {
+    mergeSort(0, array.length - 1);
+    redraw();
+    console.log("Done!");
+}
+
+async function mergeSort(start, end) {
+    if (start < end) {
+        let mid = parseInt((start + end) / 2);
+        await mergeSort(start, mid);
+        await mergeSort(mid + 1, end);
+        await merge(start, mid, end);
+    }
+}
+
+async function merge(start, mid, end) {
+    let arr1 = new Array(mid - start + 1);
+    let arr2 = new Array(end - mid);
+
+    for (let i = 0; i < arr1.length; i++)
+        arr1[i] = array[start + i];
+
+    for (let i = 0; i < arr2.length; i++)
+        arr2[i] = array[mid + i + 1];
+
+    let i = 0;
+    let j = 0;
+    let k = start;
+
+    while (i < arr1.length && j < arr2.length) {
+        if (arr1[i] < arr2[j])
+            array[k++] = arr1[i++];
+        else
+            array[k++] = arr2[j++];
+
+        await drawWithDelay();
+    }
+
+    while (i < arr1.length) {
+        array[k++] = arr1[i++];
+        await drawWithDelay();
+    }
+
+    while (j < arr2.length) {
+        array[k++] = arr2[j++];
+        await drawWithDelay();
+    }
+}
+
+function swap(i, j) {
+    let a = array[i];
+    array[i] = array[j];
+    array[j] = a;
+}
+
+async function drawWithDelay() {
+    redraw();
+    await sleep(timeDelay);
 }
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
